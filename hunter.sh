@@ -20,6 +20,10 @@ IPADDRS=()
 CHECKSMTP=0
 # Check for DNS
 CHECKDNS=0
+# Check for Heartbleed
+CHECKHEART=0
+# Check for SuperMicro IPMI Vuln
+CHECKSUPIPMI=0
 # Show help?
 SHOWHELP=0
 
@@ -39,6 +43,12 @@ while [ $# -gt 0 ]; do
 			;;
 		-d|--dns)
 			CHECKDNS="1"
+			;;
+		-b|--heartbleed)
+			CHECKHEART="1"
+			;;
+		-i|--superipmi)
+			CHECKSUPIPMI="1"
 			;;
 		-h|--help)
 			SHOWHELP="1"
@@ -61,6 +71,8 @@ if [ "${SHOWHELP}" = "1" ]; then
 	echo " -h, --help                      Show this help." >&2
 	echo " -d, --dns                       Check for Open DNS Resolver." >&2
 	echo " -s, --smtp                      Check for Open Relay." >&2
+	echo " -b, --heartbleed		       Check for SSL Heartbleed Vulnerability." >&2
+	echo " -i, --superipmi		       Check for SuperMicro IPMI Vulnerability." >&2
 	echo " -t <addr>, --to <addr>          Email address to send report to." >&2
 	echo " -f <addr>, --from <addr>        Email address to send report from." >&2
 	echo "" >&2
@@ -98,6 +110,19 @@ for i in "${IPADDRS[@]}"; do
 				echo "$IP is an open DNS Resolver." >> "${OUTFILE}"
 			fi;
 		fi;
+
+		if [ "${CHECKHEART}" -eq 1 ]; then
+			if [ "$(nmap -p 443 --script ssl-heartbleed $IP | grep "VULNERABLE")" != "" ]; then
+				echo "$IP is vulnerable to SSL Heartbleed." >> "${OUTFILE}"
+			fi;
+		fi;
+
+		if [ "${CHECKSUPIPMI}" -eq 1 ]; then
+			if [ "$(nmap -p 49152 --script supermicro-ipmi-conf $IP | grep "VULNERABLE")" != "" ]; then
+				echo "$IP has a vulnerable IPMI." >> "${OUTFILE}"
+			fi;
+		fi;
+
 	done
 done
 
