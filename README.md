@@ -25,4 +25,6 @@ Accepted flags:
 Anything param passed that isn't a flag is considered an address range to scan
 
 !! Address ranges must be a CIDR range of /31 or larger, or individual IPs (without '/32') !!
-```
+
+OpenRelayHunter is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+http://creativecommons.org/licenses/by-nc-sa/4.0/

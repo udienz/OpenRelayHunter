@@ -8,6 +8,10 @@
 #
 # Authors: Johnathan Williamson / Shane Mc Cormack
 #
+# OpenRelayHunter is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+# http://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+
 
 # Defaults.
 # To Address (if blank, just output results)
