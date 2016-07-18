@@ -6,7 +6,7 @@ Prerequisite: 'prips' utility (aptitude install prips)
 Prerequisite: 'mail' utility (aptitude install mutt)
 
 Authors: Johnathan Williamson (@SuitedUpGeek) / Shane Mc Cormack (@ShaneMcC)
-
+Credits: Alain Kelder (http://goo.gl/TNQXSq
 ```
 OpenRelay Hunter.
 
@@ -19,6 +19,7 @@ Accepted flags:
  -s, --smtp                      Check for Open Relay.
  -b, --heartbleed                Check for SSL Heartbleed Vulnerability." >&2
  -i, --superipmi                 Check for SuperMicro IPMI Vulnerability." >&2
+ -B, --blacklist		 Check for RBL Listings." >&2
  -t <addr>, --to <addr>          Email address to send report to.
  -f <addr>, --from <addr>        Email address to send report from.
 

@@ -7,6 +7,7 @@
 # Prerequisite: 'mail' utility (aptitude install mutt)
 #
 # Authors: Johnathan Williamson / Shane Mc Cormack
+# Credits: Alain Kelder (http://goo.gl/TNQXSq)
 #
 # OpenRelayHunter is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 # http://creativecommons.org/licenses/by-nc-sa/4.0/
@@ -28,6 +29,8 @@ CHECKDNS=0
 CHECKHEART=0
 # Check for SuperMicro IPMI Vuln
 CHECKSUPIPMI=0
+# Blacklist Check
+CHECKBLACK=0
 # Show help?
 SHOWHELP=0
 
@@ -54,6 +57,9 @@ while [ $# -gt 0 ]; do
 		-i|--superipmi)
 			CHECKSUPIPMI="1"
 			;;
+		-B|--blacklist)
+			CHECKBLACK="1"
+			;;
 		-h|--help)
 			SHOWHELP="1"
 			;;
@@ -77,6 +83,7 @@ if [ "${SHOWHELP}" = "1" ]; then
 	echo " -s, --smtp                      Check for Open Relay." >&2
 	echo " -b, --heartbleed		       Check for SSL Heartbleed Vulnerability." >&2
 	echo " -i, --superipmi		       Check for SuperMicro IPMI Vulnerability." >&2
+	echo " -B, --blacklist		       Check for entries on Blacklists." >&2
 	echo " -t <addr>, --to <addr>          Email address to send report to." >&2
 	echo " -f <addr>, --from <addr>        Email address to send report from." >&2
 	echo "" >&2
@@ -87,12 +94,26 @@ if [ "${SHOWHELP}" = "1" ]; then
 	exit 0;
 fi;
 
+# Pull list of RBL's for Blacklist Check if required
+if [ "${CHECKBLACK}" -eq 1 ]; then
+	# Remote List
+	WPURL="https://en.wikipedia.org/wiki/Comparison_of_DNS_blacklists"
+	WPLIST=$(curl -s $WPURL | egrep "<td>([a-z]+\.){1,7}[a-z]+</td>" | sed -r 's|</?td>||g;/$Exclude/d')
+
+	# Local List - list any custom RBL's here
+	LOCALLIST='
+		dnsbl-1.uceprotect.net
+		dnsbl-2.uceprotect.net
+		dnsbl-3.uceprotect.net
+		psbl.surriel.com
+	'
+fi;
+
 # Store output.
 OUTFILE=`mktemp /tmp/hunterlist.XXXXXXXX`
 
 # Iterate through each range and push the IP's into a new array
 for i in "${IPADDRS[@]}"; do
-	# Expand our ranges to list the full IP range
 
 	# prips doesn't like non-cidr, so for single IPs just use the IP as the start/end
 	if [ "$(echo "${i}" | grep -i "/")" = "" ]; then
@@ -127,6 +148,26 @@ for i in "${IPADDRS[@]}"; do
 			fi;
 		fi;
 
+		if [ "${CHECKBLACK}" -eq 1 ]; then
+			# Reverse our IP
+			RIP=`echo $IP | awk -F. '{print $4"."$3"."$2"."$1}'`
+
+			# Check IP against each RBL from Wikipedia
+			for BL in $WPLIST; do
+				RESULT=$(dig +short $RIP.$BL)
+				if [ -n "$RESULT" ]; then 
+					echo "$IP may be listed on $BL" >> "${OUTFILE}"
+				fi
+			done
+
+			# Check IP against each RBL from Wikipedia
+			for BL in $LOCALLIST; do
+				RESULT=$(dig +short $RIP.$BL)
+				if [ -n "$RESULT" ]; then
+					echo "$IP may be listed on $BL" >> "${OUTFILE}"
+				fi
+			done
+		fi;
 	done
 done
 
