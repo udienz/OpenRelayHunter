@@ -3,9 +3,11 @@
 Not-So-Quick and dirty script to scan a selection of IP ranges for Open SMTP or DNS resolvers
 
 Prerequisite: 'prips' utility (aptitude install prips)
+
 Prerequisite: 'mail' utility (aptitude install mutt)
 
 Authors: Johnathan Williamson (@SuitedUpGeek) / Shane Mc Cormack (@ShaneMcC)
+
 Credits: Alain Kelder (http://goo.gl/TNQXSq
 ```
 OpenRelay Hunter.
