@@ -1,6 +1,6 @@
 # OpenRelayHunter
 
-Not-So-Quick and dirty script to scan a selection of IP ranges for Open SMTP or DNS resolvers
+Not-So-Quick and dirty script to scan a selection of IP ranges for Open SMTP, DNS resolvers plus a few other useful utilities
 
 Prerequisite: 'prips' utility (aptitude install prips)
 

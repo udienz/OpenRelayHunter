@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Not-So-Quick and dirty script to scan a selection of IP ranges for
-# Open SMTP or DNS resolvers
+# Open SMTP, DNS resolvers plus a few other useful utilities
 #
 # Prerequisite: 'prips' utility (aptitude install prips)
 # Prerequisite: 'mail' utility (aptitude install mutt)
