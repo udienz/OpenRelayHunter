@@ -60,6 +60,9 @@ while [ $# -gt 0 ]; do
 		-B|--blacklist)
 			CHECKBLACK="1"
 			;;
+		-M|--mikrotik)
+			CHECKMIKROTIK="1"
+			;;
 		-h|--help)
 			SHOWHELP="1"
 			;;
@@ -84,6 +87,7 @@ if [ "${SHOWHELP}" = "1" ]; then
 	echo " -b, --heartbleed		       Check for SSL Heartbleed Vulnerability." >&2
 	echo " -i, --superipmi		       Check for SuperMicro IPMI Vulnerability." >&2
 	echo " -B, --blacklist		       Check for entries on Blacklists." >&2
+	echo " -M, --mikrotik		       Check for entries on Winbox open port." >&2
 	echo " -t <addr>, --to <addr>          Email address to send report to." >&2
 	echo " -f <addr>, --from <addr>        Email address to send report from." >&2
 	echo "" >&2
@@ -129,6 +133,13 @@ for i in "${IPADDRS[@]}"; do
 				echo "$IP is an open SMTP relay." >> "${OUTFILE}"
 			fi
 		fi;
+
+		if [ "${CHECKMIKROTIK}" -eq 1 ]; then
+			if [ "$(nmap -pT:8291 --script routeros-mikrotik $IP | grep "Winbox Port is Open")" != "" ]; then
+				echo "$IP exposed winbox port to public" >> "${OUTFILE}"
+			fi
+		fi;
+
 
 		if [ "${CHECKDNS}" -eq 1 ]; then
 			if [ "$(dig +time=1 +tries=1 +short google.com @$IP | grep -v ';;')" != "" ]; then
